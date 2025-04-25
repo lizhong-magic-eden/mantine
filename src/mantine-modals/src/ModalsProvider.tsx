@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useRef } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { Modal, getDefaultZIndex } from '@mantine/core';
 import { randomId } from '@mantine/hooks';
 import {
@@ -9,6 +9,7 @@ import {
   OpenContextModal,
   ContextModalProps,
   ModalsContextProps,
+  ModalState,
 } from './context';
 import { ConfirmModal } from './ConfirmModal';
 import { modalsReducer } from './reducer';
@@ -71,6 +72,12 @@ export function ModalsProvider({ children, modalProps, labels, modals }: ModalsP
   const [state, dispatch] = useReducer(modalsReducer, { modals: [], current: null });
   const stateRef = useRef(state);
   stateRef.current = state;
+
+  const [topModalIndex, setTopModalIndex] = useState(state.modals.length - 1);
+
+  useEffect(() => {
+    setTopModalIndex(state.modals.length - 1);
+  }, [state.modals.length]);
 
   const closeAll = useCallback(
     (canceled?: boolean) => {
@@ -155,8 +162,7 @@ export function ModalsProvider({ children, modalProps, labels, modals }: ModalsP
     closeAll,
   };
 
-  const getCurrentModal = () => {
-    const currentModal = stateRef.current.current;
+  const getModalPropsAndContent = (currentModal: ModalState) => {
     switch (currentModal?.type) {
       case 'context': {
         const { innerProps, ...rest } = currentModal.props;
@@ -199,20 +205,26 @@ export function ModalsProvider({ children, modalProps, labels, modals }: ModalsP
     }
   };
 
-  const { modalProps: currentModalProps, content } = getCurrentModal();
-
   return (
     <ModalsContext.Provider value={ctx}>
-      <Modal
-        zIndex={getDefaultZIndex('modal') + 1}
-        {...modalProps}
-        {...currentModalProps}
-        opened={state.modals.length > 0}
-        onClose={() => closeModal(state.current.id)}
-      >
-        {content}
-      </Modal>
-
+      <>
+        {state.modals.map((modal, index) => {
+          const { modalProps: currentModalProps, content } = getModalPropsAndContent(modal);
+          return (
+            <Modal
+              key={modal.id}
+              zIndex={getDefaultZIndex('modal') + 1}
+              {...modalProps}
+              {...currentModalProps}
+              opened
+              closeOnEscape={index === topModalIndex}
+              onClose={() => closeModal(modal.id)}
+            >
+              {content}
+            </Modal>
+          );
+        })}
+      </>
       {children}
     </ModalsContext.Provider>
   );
