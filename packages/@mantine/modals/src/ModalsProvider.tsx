@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import { getDefaultZIndex, Modal } from '@mantine/core';
 import { randomId } from '@mantine/hooks';
 import { ConfirmModal } from './ConfirmModal';
