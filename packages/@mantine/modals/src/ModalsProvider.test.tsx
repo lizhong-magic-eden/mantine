@@ -74,11 +74,11 @@ describe('@mantine/modals/ModalsProvider', () => {
       const closeButton = screen
         .getAllByRole('button')
         .find((btn) => btn.className.includes('close'));
-      if (closeButton) {
-        fireEvent.click(closeButton);
-        expect(screen.queryByText('Modal 3')).not.toBeInTheDocument();
-        expect(screen.getByText('Modal 2')).toBeInTheDocument();
-      }
+      expect(closeButton).toBeInTheDocument();
+
+      fireEvent.click(closeButton!);
+      expect(screen.queryByText('Modal 3')).not.toBeInTheDocument();
+      expect(screen.getByText('Modal 2')).toBeInTheDocument();
     });
 
     it('renders multiple modals simultaneously with correct content', () => {
