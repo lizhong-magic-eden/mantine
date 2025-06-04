@@ -56,27 +56,27 @@ const DemoContent = () => {
     <Button
       onClick={() => {
         modals.openModal({
-        title: 'Modal 1',
-        size: 'lg',
-        children: (
-          <div>
-            <Text>This is modal 1</Text>
-            <Button
-              fullWidth
-              mt="md"
-              onClick={() => {
-                modals.openModal({
-                  title: 'Modal 2',
-                  children: <div>This is modal 2</div>
-                });
-              }}
-            >
-              Open modal 2
-            </Button>
-          </div>
-        ),
-      });
-    }}
+          title: 'Modal 1',
+          size: 'lg',
+          children: (
+            <div>
+              <Text>This is modal 1</Text>
+              <Button
+                fullWidth
+                mt="md"
+                onClick={() => {
+                  modals.openModal({
+                    title: 'Modal 2',
+                    children: <div>This is modal 2</div>,
+                  });
+                }}
+              >
+                Open modal 2
+              </Button>
+            </div>
+          ),
+        });
+      }}
     >
       Open multiple modals
     </Button>
@@ -96,4 +96,4 @@ export const showAllModals: MantineDemo = {
   centered: true,
   component: Demo,
   code,
-}; 
+};

@@ -1,9 +1,9 @@
-import { useEffect, PropsWithChildren } from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { PropsWithChildren, useEffect } from 'react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { openModal } from './events';
 import { ModalsProvider } from './ModalsProvider';
 import { useModals } from './use-modals/use-modals';
-import { openModal } from './events';
 
 describe('@mantine/modals/ModalsProvider', () => {
   const renderWithModals = ({
@@ -22,10 +22,10 @@ describe('@mantine/modals/ModalsProvider', () => {
         </ModalsProvider>
       </MantineProvider>
     );
-  
+
     const Component = () => {
       const modals = useModals();
-  
+
       useEffect(() => {
         Array.from({ length: modalsCount }).forEach((_, index) => {
           modals.openModal({
@@ -35,10 +35,10 @@ describe('@mantine/modals/ModalsProvider', () => {
           });
         });
       }, []);
-  
+
       return <div>Empty</div>;
     };
-  
+
     return render(<Component />, { wrapper });
   };
 
@@ -71,9 +71,9 @@ describe('@mantine/modals/ModalsProvider', () => {
       expect(modals[0]).toHaveTextContent('Modal 3');
       expect(modals[0]).toHaveTextContent('Content 3');
 
-      const closeButton = screen.getAllByRole('button').find(
-        (btn) => btn.className.includes('close')
-      );
+      const closeButton = screen
+        .getAllByRole('button')
+        .find((btn) => btn.className.includes('close'));
       if (closeButton) {
         fireEvent.click(closeButton);
         expect(screen.queryByText('Modal 3')).not.toBeInTheDocument();
@@ -106,7 +106,7 @@ describe('@mantine/modals/ModalsProvider', () => {
       expect(screen.getByText('Content 1')).toBeInTheDocument();
       expect(screen.getByText('Modal 2')).toBeInTheDocument();
       expect(screen.getByText('Content 2')).toBeInTheDocument();
-    
+
       fireEvent.keyDown(modals[1], { key: 'Escape' });
 
       expect(screen.queryByText('Modal 2')).not.toBeInTheDocument();
@@ -141,10 +141,10 @@ describe('@mantine/modals/ModalsProvider', () => {
 
     it('closes all modals when closeOnEscapeTopOnly is false', () => {
       renderWithModals({ modalsCount: 2, showAllModals: true, closeOnEscapeTopOnly: false });
-      
+
       const modals = screen.getAllByRole('dialog');
       fireEvent.keyDown(modals[1], { key: 'Escape' });
-      
+
       expect(screen.queryByText('Modal 1')).not.toBeInTheDocument();
       expect(screen.queryByText('Modal 2')).not.toBeInTheDocument();
       expect(screen.queryByText('Content 1')).not.toBeInTheDocument();
