@@ -31,7 +31,10 @@ export interface ModalsProviderProps {
   /** Whether to show all modals or only the last one, `false` by default */
   showAllModals?: boolean;
 
-  /** Determines whether only the top modal should respond to escape key press, `true` by default */
+  /** 
+   * Determines whether only the top modal should respond to escape key press, `true` by default. 
+   * Note that this only takes effect when modalProps.closeOnEscape is not set to `false`.
+   */
   closeOnEscapeTopOnly?: boolean;
 }
 
@@ -248,7 +251,10 @@ export function ModalsProvider({
   const renderModals = (modalsToRender: ModalState[]) => {
     return modalsToRender.map((modal, index) => {
       const { modalProps: currentModalProps, content } = getModalPropsAndContent(modal);
-      const closeOnEscape = closeOnEscapeTopOnly ? index === topModalIndex : true;
+
+      const isTopModal = index === topModalIndex;
+      const closeOnEscape = modalProps?.closeOnEscape === false ? false : closeOnEscapeTopOnly ? isTopModal : true;
+
       return (
         <Modal
           key={modal.id}
