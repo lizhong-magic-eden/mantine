@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { getDefaultZIndex, Modal } from '@mantine/core';
 import { randomId } from '@mantine/hooks';
 import { ConfirmModal } from './ConfirmModal';
@@ -87,17 +87,21 @@ export function ModalsProvider({
 }: ModalsProviderProps) {
   const [state, dispatch] = useReducer(modalsReducer, { modals: [] });
 
+  const visibleModals = useMemo(() => {
+    return state.modals.length > 0 ? (showAllModals ? state.modals : state.modals.slice(-1)) : [];
+  }, [state.modals, showAllModals]);
+
   /**
-   * IMPORTANT: Do NOT replace this with `const topModalIndex = state.modals.length - 1`.
+   * IMPORTANT: Do NOT replace this with `const topModalIndex = visibleModals.length - 1`.
    * If we use the direct calculation, during modal close on Esc, React's batch updates and multiple renders
    * can cause lower modals to also get closeOnEscape = true in the same render cycle, resulting in multiple modals closing at once.
    * useState + useEffect ensures topModalIndex updates "one render late", so only the top modal responds to Esc, preventing this bug
    */
-  const [topModalIndex, setTopModalIndex] = useState(state.modals.length - 1);
+  const [topModalIndex, setTopModalIndex] = useState(visibleModals.length - 1);
 
   useEffect(() => {
-    setTopModalIndex(state.modals.length - 1);
-  }, [state.modals.length]);
+    setTopModalIndex(visibleModals.length - 1);
+  }, [visibleModals.length]);
 
   const closeAll = useCallback(
     (canceled?: boolean) => {
@@ -275,9 +279,6 @@ export function ModalsProvider({
       );
     });
   };
-
-  const visibleModals =
-    state.modals.length > 0 ? (showAllModals ? state.modals : state.modals.slice(-1)) : [];
 
   return (
     <ModalsContext.Provider value={ctx}>
