@@ -1,6 +1,7 @@
 import { PropsWithChildren, useEffect } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
+import { ModalSettings } from './context';
 import { openModal } from './events';
 import { ModalsProvider } from './ModalsProvider';
 import { useModals } from './use-modals/use-modals';
@@ -10,14 +11,20 @@ describe('@mantine/modals/ModalsProvider', () => {
     modalsCount,
     showAllModals,
     closeOnEscapeTopOnly,
+    modalProps,
   }: {
     modalsCount: number;
     showAllModals?: boolean;
     closeOnEscapeTopOnly?: boolean;
+    modalProps?: ModalSettings;
   }) => {
     const wrapper = ({ children }: PropsWithChildren<unknown>) => (
       <MantineProvider>
-        <ModalsProvider showAllModals={showAllModals} closeOnEscapeTopOnly={closeOnEscapeTopOnly}>
+        <ModalsProvider
+          showAllModals={showAllModals}
+          closeOnEscapeTopOnly={closeOnEscapeTopOnly}
+          modalProps={modalProps}
+        >
           {children}
         </ModalsProvider>
       </MantineProvider>
@@ -149,6 +156,22 @@ describe('@mantine/modals/ModalsProvider', () => {
       expect(screen.queryByText('Modal 2')).not.toBeInTheDocument();
       expect(screen.queryByText('Content 1')).not.toBeInTheDocument();
       expect(screen.queryByText('Content 2')).not.toBeInTheDocument();
+    });
+
+    it('does not close any modal when closeOnEscape is set to false', () => {
+      renderWithModals({
+        modalsCount: 2,
+        showAllModals: true,
+        modalProps: { closeOnEscape: false },
+      });
+
+      const modals = screen.getAllByRole('dialog');
+      fireEvent.keyDown(modals[1], { key: 'Escape' });
+
+      expect(screen.queryByText('Modal 1')).toBeInTheDocument();
+      expect(screen.queryByText('Modal 2')).toBeInTheDocument();
+      expect(screen.queryByText('Content 1')).toBeInTheDocument();
+      expect(screen.queryByText('Content 2')).toBeInTheDocument();
     });
   });
 });
