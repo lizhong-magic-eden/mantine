@@ -33,7 +33,7 @@ export interface ModalsProviderProps {
 
   /**
    * Determines whether only the top modal should respond to escape key press, `true` by default.
-   * Note that this only takes effect when modalProps.closeOnEscape is not set to `false`.
+   * Note that this only takes effect when `closeOnEscape` is not set to `false`.
    */
   closeOnEscapeTopOnly?: boolean;
 }
@@ -255,8 +255,10 @@ export function ModalsProvider({
       const { modalProps: currentModalProps, content } = getModalPropsAndContent(modal);
 
       const isTopModal = index === topModalIndex;
+
+      const modalPropsCloseOnEscape = modal.props.closeOnEscape ?? modalProps?.closeOnEscape;
       const closeOnEscape =
-        modalProps?.closeOnEscape === false ? false : closeOnEscapeTopOnly ? isTopModal : true;
+        modalPropsCloseOnEscape === false ? false : closeOnEscapeTopOnly ? isTopModal : true;
 
       return (
         <Modal
